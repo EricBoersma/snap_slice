@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import tensorflow as tf
 import argparse
 
@@ -12,11 +11,14 @@ def load_labels(labels_location = 'retrained_labels.txt'):
     
     return label
 
+
 def load_vidcap(file_location = 'tf_files/test_videos/test_video1.mp4'):
     return cv2.VideoCapture(file_location)
 
+
 def get_video_fps(video_capture):
     return int(round(vidcap.get(cv2.CAP_PROP_FPS)))
+
 
 def process_frame(frame_image, graph_location, labels):    
     graph = tf.Graph()
@@ -53,7 +55,6 @@ def process_frame(frame_image, graph_location, labels):
             print(e)
 
 
-
 if __name__ == "__main__":
     label_file = 'retrained_labels.txt'
     graph_file = 'retrained_graph.pb'
@@ -71,7 +72,6 @@ if __name__ == "__main__":
         graph_file = args.graph_file
     if args.label_file:
         label_file = args.label_file
-
 
     labels = load_labels(label_file)
     vidcap = load_vidcap(video_file)

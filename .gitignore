@@ -11,3 +11,5 @@ android/assets/*
 .vscode/settings.json
 .DS_Store
 venv
+
+*.iml
