@@ -16,7 +16,7 @@ def load_vidcap(file_location = 'tf_files/test_videos/test_video1.mp4'):
     return cv2.VideoCapture(file_location)
 
 
-def get_video_fps(video_capture):
+def get_video_fps(vidcap):
     return int(round(vidcap.get(cv2.CAP_PROP_FPS)))
 
 
