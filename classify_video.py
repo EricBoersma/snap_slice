@@ -4,6 +4,7 @@ import argparse
 import threading
 import multiprocessing
 import time
+import chunk_evaluator as evaluator
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -95,11 +96,11 @@ if __name__ == "__main__":
     count = 0
     frames = {}
     threads = []
+    frame_types = {}
 
     start = time.time()
 
     while success:
-        print("Video FPS: %d" % fps)
         for i in range(0, multiprocessing.cpu_count()):
             process = threading.Thread(target=load_and_process, args=(count, frame, frames))
             for x in range(0, frame_skip): # skip some frames, as we don't need to process every frame
@@ -110,7 +111,7 @@ if __name__ == "__main__":
         for ii in range(len(threads)):
             threads[ii].join()
         print("Frame: %d" % count)
-        print(frames)
+        print(evaluator.evaluate_chunk(frames))
         frames = {}
         threads = []
     
