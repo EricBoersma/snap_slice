@@ -3,6 +3,7 @@ import tensorflow as tf
 import argparse
 import threading
 import multiprocessing
+import time
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -59,8 +60,9 @@ def process_frame(frame_image, graph_location, labels):
 
 def load_and_process(frame_num, frame_to_load, all_frames):
     _, encoded_frame = cv2.imencode('.jpg', frame_to_load)
-    classification = process_frame(encoded_frame.tostring(), graph_file, labels)
-    all_frames[frame_num] = classification
+    if encoded_frame.any():
+        classification = process_frame(encoded_frame.tostring(), graph_file, labels)
+        all_frames[frame_num] = classification
 
 
 if __name__ == "__main__":
@@ -88,24 +90,29 @@ if __name__ == "__main__":
     vidcap = load_vidcap(video_file)
     fps = get_video_fps(vidcap)
     success, frame = vidcap.read()
+    frame_skip = fps / 4
 
     count = 0
     frames = {}
     threads = []
 
+    start = time.time()
+
     while success:
-        for i in range(1, multiprocessing.cpu_count()):
+        print("Video FPS: %d" % fps)
+        for i in range(0, multiprocessing.cpu_count()):
             process = threading.Thread(target=load_and_process, args=(count, frame, frames))
-            success, frame = vidcap.read()
-            count += 1
+            for x in range(0, frame_skip): # skip some frames, as we don't need to process every frame
+                success, frame = vidcap.read()
+                count += 1
             process.start()
             threads.append(process)
         for ii in range(len(threads)):
             threads[ii].join()
         print("Frame: %d" % count)
-        print("Threads: %d" % len(threads))
         print(frames)
         frames = {}
         threads = []
-
-
+    
+    end = time.time()
+    print("Total time elapsed processing video: %f" %(end - start))
