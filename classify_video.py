@@ -86,7 +86,7 @@ if __name__ == "__main__":
     while success:
         result, encoded_frame = cv2.imencode('.jpg', frame)
         frame_classification = process_frame(encoded_frame.tostring(), graph_file, labels)
-        print('Frame: ', count)
+        print('Frame: %d' % count)
         print(frame_classification)
         success, frame = vidcap.read()
         count += 1
