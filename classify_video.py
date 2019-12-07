@@ -2,6 +2,7 @@ import cv2
 import tensorflow as tf
 import argparse
 import threading
+import multiprocessing
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     threads = []
 
     while success:
-        for i in range(0, 16):
+        for i in range(1, multiprocessing.cpu_count()):
             process = threading.Thread(target=load_and_process, args=(count, frame, frames))
             success, frame = vidcap.read()
             count += 1
