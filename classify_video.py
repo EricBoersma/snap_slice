@@ -1,6 +1,7 @@
 import cv2
 import tensorflow as tf
 import argparse
+import threading
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -55,6 +56,12 @@ def process_frame(frame_image, graph_location, labels):
             print(e)
 
 
+def load_and_process(frame_num, frame_to_load, all_frames):
+    _, encoded_frame = cv2.imencode('.jpg', frame_to_load)
+    classification = process_frame(encoded_frame.tostring(), graph_file, labels)
+    all_frames[frame_num] = classification
+
+
 if __name__ == "__main__":
     label_file = 'retrained_labels.txt'
     graph_file = 'retrained_graph.pb'
@@ -82,11 +89,22 @@ if __name__ == "__main__":
     success, frame = vidcap.read()
 
     count = 0
+    frames = {}
+    threads = []
 
     while success:
-        result, encoded_frame = cv2.imencode('.jpg', frame)
-        frame_classification = process_frame(encoded_frame.tostring(), graph_file, labels)
-        print('Frame: %d' % count)
-        print(frame_classification)
-        success, frame = vidcap.read()
-        count += 1
+        for i in range(0, 16):
+            process = threading.Thread(target=load_and_process, args=(count, frame, frames))
+            success, frame = vidcap.read()
+            count += 1
+            process.start()
+            threads.append(process)
+        for ii in range(len(threads)):
+            threads[ii].join()
+        print("Frame: %d" % count)
+        print("Threads: %d" % len(threads))
+        print(frames)
+        frames = {}
+        threads = []
+
+
