@@ -1,13 +1,24 @@
 # snap_slice
 
-This is abandonware. The original purpose of this repository was simply to do some learning with 
-Tensorflow to get an introduction to using machine learning to do image analysis. When that went well,
-I started using it for doing so on video. Unfortunately, the subject that I chose (recognizing parts of a football broadcast)
-meant doing more full-image pattern matching than working on individual parts of a video. Also, it's likely
-that my usage here is inefficient, as this is the first project I ever undertook using
-Tensorflow. The result is that this code can process video at about 3 frames per second,
-or approximately 1/8th to 1/10th as fast as just watching the video. 
+This is a work in progress. Right now, it's not fully functional. It'll read a video
+and use Tensorflow to examine that video and determine which parts of a football
+broadcast it's looking at. Eventually, the goal is to slice that video
+into easily-uploadable clips. Unfortunately, it doesn't do that last part right now.
 
-So, if you find this code, or the training files to be useful, please feel free to use them. 
-They're effective, and can recognize the different parts of a football broadcast with
-about 97% accuracy.  
+To install this, simply clone the repository on a system with python installed.
+Installing the requirements for the project are as simple as
+
+```bash
+pip install -r requirements.txt
+```
+
+Once you've installed the requirements, you can run the slicer by running
+
+```bash
+python classify_video.py --help
+```
+
+That script accepts a number of arguments. Help will explain what each argument
+does and how to pass it to the script. 
+
+If you're trying to use this on Windows, I recommend installing [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
