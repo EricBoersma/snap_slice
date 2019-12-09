@@ -13,3 +13,5 @@ android/assets/*
 venv
 
 *.iml
+.vscode/.ropeproject/config.py
+.vscode/.ropeproject/objectdb
