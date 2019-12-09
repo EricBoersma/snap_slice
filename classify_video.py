@@ -5,6 +5,7 @@ import threading
 import multiprocessing
 import time
 import chunk_evaluator as evaluator
+import slice_manager
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -99,6 +100,7 @@ if __name__ == "__main__":
     frame_types = {}
 
     start = time.time()
+    manager = slice_manager.SliceManager()
 
     while success:
         for i in range(0, multiprocessing.cpu_count()):
@@ -110,10 +112,12 @@ if __name__ == "__main__":
             threads.append(process)
         for ii in range(len(threads)):
             threads[ii].join()
-        print("Frame: %d" % count)
-        print(evaluator.evaluate_chunk(frames))
+        evaluator.evaluate_chunk(frames, manager, count)
+        print("Current frame: %d" % count)
         frames = {}
         threads = []
     
+    print("Finished evaluating")
+    print(manager.slices)
     end = time.time()
     print("Total time elapsed processing video: %f" %(end - start))

@@ -1,7 +1,7 @@
 
 def get_frame_type(frame):
     if frame['snaps'] > .90:
-        return 'snap'
+        return 'play'
 
     if frame['replays'] > .90:
         return 'replay'
@@ -14,16 +14,11 @@ def get_frame_type(frame):
 
     return 'transition'
 
-def evaluate_chunk(chunk):
+
+def evaluate_chunk(chunk, slice_evaluator, frame_count):
     keys = chunk.keys()
     keys.sort()
-    types = []
     for key in keys:
         frame_type = get_frame_type(chunk[key])
-        print("Frame Type: %s, frame #: %d" %(frame_type, key))
-        types.append(frame_type)
+        slice_evaluator.process_frame(frame_type, frame_count)
 
-    if types.count(types[0]) == len(types):
-        return types[0] 
-    
-    return 'transition'
