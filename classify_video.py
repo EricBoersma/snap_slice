@@ -6,6 +6,7 @@ import multiprocessing
 import time
 import chunk_evaluator as evaluator
 import slice_manager
+import progressbar
 
 
 def load_labels(labels_location='retrained_labels.txt'):
@@ -23,6 +24,17 @@ def load_vidcap(file_location):
 
 def get_video_fps(vidcap):
     return int(round(vidcap.get(cv2.CAP_PROP_FPS)))
+
+
+def get_total_video_frames(vidcap):
+    return int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+def skip_frames(vidcap, num_skip):
+    frame = None
+    for _ in range(0, num_skip):
+        _, frame = vidcap.read()
+
+    return frame
 
 
 def process_frame(frame_image, graph_location, labels):
@@ -93,6 +105,7 @@ if __name__ == "__main__":
     fps = get_video_fps(vidcap)
     success, frame = vidcap.read()
     frame_skip = fps / 4
+    total_frames = get_total_video_frames(vidcap)
 
     count = 0
     frames = {}
@@ -102,21 +115,26 @@ if __name__ == "__main__":
     start = time.time()
     manager = slice_manager.SliceManager()
 
-    while success:
-        for i in range(0, multiprocessing.cpu_count()):
-            process = threading.Thread(target=load_and_process, args=(count, frame, frames))
-            for x in range(0, frame_skip): # skip some frames, as we don't need to process every frame
-                success, frame = vidcap.read()
-                count += 1
-            process.start()
-            threads.append(process)
-        for ii in range(len(threads)):
-            threads[ii].join()
-        evaluator.evaluate_chunk(frames, manager, count)
-        print("Current frame: %d" % count)
-        frames = {}
-        threads = []
-    
+    with progressbar.ProgressBar(max_value=total_frames) as bar:
+        while count <= 1000:
+            bar.update(count)
+            for i in range(0, multiprocessing.cpu_count()):
+                process = threading.Thread(target=load_and_process, args=(count, frame, frames))
+                process.start()
+                threads.append(process)
+                frame = skip_frames(vidcap, frame_skip)
+                count += frame_skip
+            
+            for ii in range(len(threads)):
+                threads[ii].join()
+            
+            evaluator.evaluate_chunk(frames, manager, count)
+            frames = {}
+            threads = []
+        
+        if manager.should_add_slice(count):
+            manager.add_slice(manager.current_slice_start, count)
+
     print("Finished evaluating")
     print(manager.slices)
     end = time.time()

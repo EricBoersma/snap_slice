@@ -12,6 +12,9 @@ def get_frame_type(frame):
     if frame['other'] > .90:
         return 'other'
 
+    if frame['plays'] + frame['snaps'] > .90:
+        return 'play'
+
     return 'transition'
 
 
@@ -20,5 +23,5 @@ def evaluate_chunk(chunk, slice_evaluator, frame_count):
     keys.sort()
     for key in keys:
         frame_type = get_frame_type(chunk[key])
-        slice_evaluator.process_frame(frame_type, frame_count)
+        slice_evaluator.process_frame(frame_type, key)
 

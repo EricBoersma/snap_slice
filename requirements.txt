@@ -14,4 +14,4 @@ tensorboard==1.12.2
 tensorflow==1.12.0
 termcolor==1.1.0
 Werkzeug==0.14.1
-opencv-ptyhon==1.16.0
+progressbar2
