@@ -116,7 +116,7 @@ if __name__ == "__main__":
     manager = slice_manager.SliceManager()
 
     with progressbar.ProgressBar(max_value=total_frames) as bar:
-        while count <= 1000:
+        while success:
             bar.update(count)
             for i in range(0, multiprocessing.cpu_count()):
                 process = threading.Thread(target=load_and_process, args=(count, frame, frames))
